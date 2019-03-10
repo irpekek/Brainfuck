@@ -1,0 +1,7 @@
+{
+  "host": "uk.ssl.sshaccess.com",
+  "port": "443",
+  "username": "sshaccess.com-rabbit",
+  "password": "rabbit",
+  "sockport": "1080"
+}
