@@ -64,8 +64,7 @@ service()
 
 stopscreen()
 {
-    echo >> $BRAINFUCK_TUNNEL_APP_LOG
-    echo >> $BRAINFUCK_TUNNEL_APP_LOG
+    echo $1 >> $BRAINFUCK_TUNNEL_APP_LOG
 }
 
 #
@@ -74,7 +73,7 @@ stopscreen()
 help()
 {
     log 'Usage: brainfuck [start] [run] [connect] [restart]'
-    log '                 [reconnect] [stop] [disconnect] '
+    log '                 [reconnect] [stop] [disconnect]'
     log '                 [reset]'
 }
 
@@ -120,7 +119,7 @@ start()
 
                                 # configurations iptables and redsocks here
 
-                                stopscreen
+                                stopscreen "[$( date +%T )] Brainfuck running in the background"
                                 break
                             ;;
                         esac
@@ -131,6 +130,25 @@ start()
 
         1 )
             logtime 'Brainfuck is running!' $R1
+        ;;
+    esac
+}
+
+showlog()
+{
+    local running;
+
+    running=0 && is_running || running=1
+
+    case $running in
+        0 )
+            logtime "Brainfuck not running!" $R1
+        ;;
+
+        1 )
+            while read value; do
+                log "$value"
+            done < $BRAINFUCK_TUNNEL_APP_LOG
         ;;
     esac
 }
@@ -149,6 +167,8 @@ stop()
         ;;
 
         1 )
+            if [[ -z $1 ]]; then showlog; fi
+
             # configurations iptables and redsocks here
 
             killpid "$BRAINFUCK_TUNNEL_APP_PID"
@@ -164,8 +184,9 @@ menu()
 {
     clear; clear
     log 'Brainfuck Tunnel [Rabbit Version 1.3.190310]'
-    log '(c) 2019 Aztec Rabbit.'; echo
+    log '(c) 2019 Aztec Rabbit.'
 
+    echo
     case $1 in
 
         'start' | 'run' | 'connect' )
@@ -186,9 +207,18 @@ menu()
             logtime 'Reseting to default settings complete'
         ;;
 
+        'log' | 'status' )
+            showlog
+        ;;
+
+        'update' )
+            cd $DIR; git pull
+        ;;
+
         * )
             help
         ;;
+
     esac
     echo
 }

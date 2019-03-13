@@ -210,5 +210,3 @@ class tunnel(threading.Thread):
         elif self.tunnel_type == '0': self.tunnel_type_0()
         elif self.tunnel_type == '1': self.tunnel_type_1()
         elif self.tunnel_type == '2': self.tunnel_type_2()
-
-
