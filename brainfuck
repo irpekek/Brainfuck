@@ -7,25 +7,25 @@ Y1='\e[33;1m'
 
 DIR="$( dirname $(readlink -f $0))"
 PYTHON='python3'
-BRAINFUCK_TUNNEL="$DIR/.brainfuck-tunnel"
-BRAINFUCK_TUNNEL_APP="$BRAINFUCK_TUNNEL/app.py"
-BRAINFUCK_TUNNEL_APP_PID="$BRAINFUCK_TUNNEL/storage/app.pid"
-BRAINFUCK_TUNNEL_APP_LOG="$BRAINFUCK_TUNNEL/storage/app.log"
-BRAINFUCK_TUNNEL_ACCOUNT="$BRAINFUCK_TUNNEL/database/account.json"
-BRAINFUCK_TUNNEL_DEFAULT_SETTINGS="$BRAINFUCK_TUNNEL/default-settings.py"
-BRAINFUCK_TUNNEL_RESET_TO_DEFAULT_SETTINGS="$BRAINFUCK_TUNNEL/reset-to-default-settings.py"
+BRAINFUCK_TUNNEL="${DIR}/.brainfuck-tunnel"
+BRAINFUCK_TUNNEL_APP="${BRAINFUCK_TUNNEL}/app.py"
+BRAINFUCK_TUNNEL_APP_PID="${BRAINFUCK_TUNNEL}/storage/app.pid"
+BRAINFUCK_TUNNEL_APP_LOG="${BRAINFUCK_TUNNEL}/storage/app.log"
+BRAINFUCK_TUNNEL_ACCOUNT="${BRAINFUCK_TUNNEL}/database/account.json"
+BRAINFUCK_TUNNEL_DEFAULT_SETTINGS="${BRAINFUCK_TUNNEL}/default-settings.py"
+BRAINFUCK_TUNNEL_RESET_TO_DEFAULT_SETTINGS="${BRAINFUCK_TUNNEL}/reset-to-default-settings.py"
 
 #
 #
 
 log()
 {
-    echo -e "$G1$2$1$CC$3"
+    echo -e "$G1$2$1$CC"
 }
 
 logtime()
 {
-    log "[$( date +%T )] $1" $2 $3
+    log "[$( date +%T )] $1" $2
 }
 
 createfile()
@@ -122,6 +122,7 @@ start()
         ;;
 
         1 )
+            showlog; echo
             logtime 'Brainfuck is running!' $R1
         ;;
     esac
