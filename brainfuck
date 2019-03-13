@@ -20,12 +20,12 @@ BRAINFUCK_TUNNEL_RESET_TO_DEFAULT_SETTINGS="$BRAINFUCK_TUNNEL/reset-to-default-s
 
 log()
 {
-    echo -e "$G1$2$1$CC"
+    echo -e "$G1$2$1$CC$3"
 }
 
 logtime()
 {
-    log "[$( date +%T )] $1" $2
+    log "[$( date +%T )] $1" $2 $3
 }
 
 createfile()
@@ -217,7 +217,11 @@ menu()
         ;;
 
         'update' )
-            cd $DIR; git pull
+            cd $DIR
+            logtime 'Brainfuck update started'
+            logtime 'Response:' $G1 $G1
+            echo; git pull; echo
+            logtime 'Brainfuck update stopped.'
         ;;
 
         * )
