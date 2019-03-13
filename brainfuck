@@ -70,13 +70,6 @@ stopscreen()
 #
 #
 
-help()
-{
-    log 'Usage: brainfuck [start] [run] [connect] [restart]'
-    log '                 [reconnect] [stop] [disconnect]'
-    log '                 [reset]'
-}
-
 is_running()
 {
     if [[ ! -z $(readfile $BRAINFUCK_TUNNEL_APP_PID ) ]]; then running=1; else running=0; fi
@@ -134,25 +127,6 @@ start()
     esac
 }
 
-showlog()
-{
-    local running;
-
-    running=0 && is_running || running=1
-
-    case $running in
-        0 )
-            logtime "Brainfuck not running!" $R1
-        ;;
-
-        1 )
-            while read value; do
-                log "$value"
-            done < $BRAINFUCK_TUNNEL_APP_LOG
-        ;;
-    esac
-}
-
 stop()
 {
     local running;
@@ -180,6 +154,39 @@ stop()
     esac
 }
 
+showlog()
+{
+    local running;
+
+    running=0 && is_running || running=1
+
+    case $running in
+        0 )
+            logtime "Brainfuck not running!" $R1
+        ;;
+
+        1 )
+            while read value; do
+                log "$value"
+            done < $BRAINFUCK_TUNNEL_APP_LOG
+        ;;
+    esac
+}
+
+reset_to_default_settings()
+{
+    logtime 'Reseting to default settings'
+    $PYTHON $BRAINFUCK_TUNNEL_RESET_TO_DEFAULT_SETTINGS &> /dev/null
+    logtime 'Reseting to default settings complete'
+}
+
+help()
+{
+    log 'Usage: brainfuck [start] [run] [connect] [stop] [disconnect]'
+    log '                 [restart] [reconnect] [reset] [default]'
+    log '                 [log] [update]'
+}
+
 menu()
 {
     clear; clear
@@ -201,13 +208,11 @@ menu()
             stop false; start
         ;;
 
-        'reset' )
-            logtime 'Reseting to default settings'
-            $PYTHON $BRAINFUCK_TUNNEL_RESET_TO_DEFAULT_SETTINGS &> /dev/null
-            logtime 'Reseting to default settings complete'
+        'reset' | 'default' )
+            reset_to_default_settings
         ;;
 
-        'log' | 'status' )
+        'log' )
             showlog
         ;;
 
