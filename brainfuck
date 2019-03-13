@@ -64,7 +64,7 @@ service()
 
 stopscreen()
 {
-    echo $1 >> $BRAINFUCK_TUNNEL_APP_LOG
+    echo $2 >> $1
 }
 
 #
@@ -79,10 +79,7 @@ is_running()
 
 start()
 {
-    local running;
-    local status;
-
-    running=0 && is_running || running=1
+    local running; running=0 && is_running || running=1
 
     case $running in
         0 )
@@ -95,28 +92,27 @@ start()
                         echo; continue
                     fi
 
-                    log "$line"
+                    case $( echo "$line" | grep -E '\[[0-9:]{8}\] (Connected|Disconnected)' | awk -F ' ' '{print $2}') in
+                        'Disconnected' )
+                            stop false
 
-                    status=$( echo "$line" | grep -E '\[[0-9:]{8}\] (Connected|Disconnected)' | awk -F ' ' '{print $2}')
+                            stopscreen $BRAINFUCK_TUNNEL_APP_LOG
+                            break
+                        ;;
 
-                    if [[ ! -z "$status" ]]; then
-                        case $status in
-                            'Disconnected' )
-                                stop false
+                        'Connected' )
+                            log "$line"
 
-                                stopscreen
-                                break
-                            ;;
+                            # configurations iptables and redsocks here
 
-                            'Connected' )
+                            stopscreen $BRAINFUCK_TUNNEL_APP_LOG "[$( date +%T )] Brainfuck running in the background"
+                            break
+                        ;;
 
-                                # configurations iptables and redsocks here
-
-                                stopscreen "[$( date +%T )] Brainfuck running in the background"
-                                break
-                            ;;
-                        esac
-                    fi
+                        * )
+                            log "$line"
+                        ;;
+                    esac
                 done
             }
         ;;
@@ -130,9 +126,7 @@ start()
 
 stop()
 {
-    local running;
-
-    running=0 && is_running || running=1
+    local running; running=0 && is_running || running=1
 
     case $running in
         0 )
@@ -157,9 +151,7 @@ stop()
 
 showlog()
 {
-    local running;
-
-    running=0 && is_running || running=1
+    local running; running=0 && is_running || running=1
 
     case $running in
         0 )
@@ -167,8 +159,8 @@ showlog()
         ;;
 
         1 )
-            while read value; do
-                log "$value"
+            while read line; do
+                log "$line"
             done < $BRAINFUCK_TUNNEL_APP_LOG
         ;;
     esac
@@ -218,10 +210,9 @@ menu()
         ;;
 
         'update' )
-            cd $DIR
             logtime 'Brainfuck update started'
             logtime 'Response:'
-            echo; git pull; echo
+            echo; cd "$DIR"; git pull; echo
             logtime 'Brainfuck update stopped.'
         ;;
 
