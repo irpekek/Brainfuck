@@ -219,7 +219,7 @@ menu()
         'update' )
             cd $DIR
             logtime 'Brainfuck update started'
-            logtime 'Response:' $G1 $G1
+            logtime 'Response:'
             echo; git pull; echo
             logtime 'Brainfuck update stopped.'
         ;;
