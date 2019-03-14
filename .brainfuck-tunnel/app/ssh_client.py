@@ -5,7 +5,7 @@ class ssh_client(object):
     def __init__(self, inject_host_port, proxy_command):
         super(ssh_client, self).__init__()
 
-        self.inject_host, self.inject_port = self.inject_host_port = inject_host_port
+        self.inject_host, self.inject_port = inject_host_port
         self.proxy_command = proxy_command
         self.account = {}
 
@@ -26,7 +26,7 @@ class ssh_client(object):
             
             response = subprocess.Popen(
                 (
-                    'sshpass -p "{password}" ssh -v -CND {sockport} {host} -p {port} -l "{username}" '                          + \
+                    'sshpass -p "{password}" ssh -v -CND {sockport} {host} -p {port} -l "{username}" ' + \
                     '-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ProxyCommand="{}"'.format(proxy_command)
                 ).format(
                     host=host,
