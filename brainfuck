@@ -1,9 +1,9 @@
 #!/bin/bash
 
-CC='\e[0m'
-R1='\e[31;1m'
-G1='\e[32;1m'
-Y1='\e[33;1m'
+CC='[0m'
+R1='[31;1m'
+G1='[32;1m'
+Y1='[33;1m'
 
 DIR="$( dirname $(readlink -f $0))"
 PYTHON='python3'
@@ -106,7 +106,7 @@ start()
 
                             # configurations iptables and redsocks here
 
-                            stopscreen $BRAINFUCK_TUNNEL_APP_LOG "[$( date +%T )] Brainfuck running in the background"
+                            stopscreen $BRAINFUCK_TUNNEL_APP_LOG "[32;1m[$( date +%T )] Brainfuck running in the background"
                             break
                         ;;
 
@@ -227,7 +227,7 @@ menu()
 #
 
 if [[ ! -z $(readfile $BRAINFUCK_TUNNEL_COMMAND_PYTHON ) ]]; then
-    PYTHON=$(readfile $BRAINFUCK_TUNNEL_COMMAND_PYTHON )
+    PYTHON=$(readfile $BRAINFUCK_TUNNEL_COMMAND_PYTHON | awk 'NR==1' | awk -F '\r' '{print $1}' )
 fi
 
 $PYTHON $BRAINFUCK_TUNNEL_DEFAULT_SETTINGS &> /dev/null
