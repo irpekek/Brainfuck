@@ -136,8 +136,6 @@ stop()
         ;;
 
         1 )
-            if [[ -z $1 ]]; then showlog; fi
-
             # configurations iptables and redsocks here
 
             killpid "$BRAINFUCK_TUNNEL_APP_PID"
