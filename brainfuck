@@ -8,13 +8,16 @@ Y1='[33;1m'
 DIR="$( dirname $(readlink -f $0))"
 PYTHON='python3'
 BRAINFUCK_TUNNEL="${DIR}/.brainfuck-tunnel"
+
 BRAINFUCK_TUNNEL_APP="${BRAINFUCK_TUNNEL}/app.py"
+BRAINFUCK_TUNNEL_SNI_SCANNER="${BRAINFUCK_TUNNEL}/sni-scanner.py"
+BRAINFUCK_TUNNEL_DEFAULT_SETTINGS="${BRAINFUCK_TUNNEL}/default-settings.py"
+BRAINFUCK_TUNNEL_RESET_TO_DEFAULT_SETTINGS="${BRAINFUCK_TUNNEL}/reset-to-default-settings.py"
+
 BRAINFUCK_TUNNEL_APP_PID="${BRAINFUCK_TUNNEL}/storage/app.pid"
 BRAINFUCK_TUNNEL_APP_LOG="${BRAINFUCK_TUNNEL}/storage/app.log"
 BRAINFUCK_TUNNEL_ACCOUNT="${BRAINFUCK_TUNNEL}/database/account.json"
 BRAINFUCK_TUNNEL_COMMAND_PYTHON="${BRAINFUCK_TUNNEL}/config/command-python.txt"
-BRAINFUCK_TUNNEL_DEFAULT_SETTINGS="${BRAINFUCK_TUNNEL}/default-settings.py"
-BRAINFUCK_TUNNEL_RESET_TO_DEFAULT_SETTINGS="${BRAINFUCK_TUNNEL}/reset-to-default-settings.py"
 
 #
 #
@@ -71,9 +74,27 @@ stopscreen()
 #
 #
 
+banner()
+{
+    log 'Brainfuck Tunnel [Rabbit Version 1.3.190310]'
+    log '(c) 2019 Aztec Rabbit.'
+}
+
 is_running()
 {
     if [[ ! -z $(readfile $BRAINFUCK_TUNNEL_APP_PID ) ]]; then running=1; else running=0; fi
+
+    if [[ $1 == 'show' ]]; then
+        case $running in
+            0 )
+                logtime 'Brainfuck not running.' $R1
+            ;;
+
+            1 )
+                logtime 'Brainfuck is running'
+            ;;
+        esac
+    fi
 
     return $running
 }
@@ -106,7 +127,7 @@ start()
 
                             # configurations iptables and redsocks here
 
-                            stopscreen $BRAINFUCK_TUNNEL_APP_LOG "[32;1m[$( date +%T )] Brainfuck running in the background"
+                            stopscreen $BRAINFUCK_TUNNEL_APP_LOG "${G1}[$( date +%T )] Brainfuck running in the background"
                             break
                         ;;
 
@@ -132,7 +153,7 @@ stop()
     case $running in
         0 )
             if [[ -z $1 ]]; then
-                logtime "Brainfuck not running." $R1
+                logtime "Brainfuck not running!" $R1
             fi
         ;;
 
@@ -165,6 +186,14 @@ showlog()
     esac
 }
 
+update()
+{
+    logtime 'Brainfuck update started'
+    logtime 'Response:'
+    echo; cd "$DIR"; git pull; echo
+    logtime 'Brainfuck update stopped.'
+}
+
 reset_to_default_settings()
 {
     logtime 'Reseting to default settings'
@@ -176,14 +205,13 @@ help()
 {
     log 'Usage: brainfuck [start] [run] [connect] [stop] [disconnect]'
     log '                 [restart] [reconnect] [reset] [default]'
-    log '                 [log] [update]'
+    log '                 [sni-scanner (hostname)] [log]'
+    log '                 [status] [update]'
 }
 
 menu()
 {
-    clear; clear
-    log 'Brainfuck Tunnel [Rabbit Version 1.3.190310]'
-    log '(c) 2019 Aztec Rabbit.'
+    clear; clear; banner
 
     echo
     case $1 in
@@ -200,6 +228,8 @@ menu()
             stop false; start
         ;;
 
+        ##
+
         'reset' | 'default' )
             reset_to_default_settings
         ;;
@@ -208,11 +238,27 @@ menu()
             showlog
         ;;
 
+        'status' )
+            is_running show
+        ;;
+
         'update' )
-            logtime 'Brainfuck update started'
-            logtime 'Response:'
-            echo; cd "$DIR"; git pull; echo
-            logtime 'Brainfuck update stopped.'
+            update
+        ;;
+
+        ##
+
+        'sni-scanner' )
+            if [[ -z $2 ]]; then
+                log 'Usage: brainfuck sni-scanner hostname'; echo
+                return
+            fi
+
+            $PYTHON $BRAINFUCK_TUNNEL_SNI_SCANNER $2
+        ;;
+
+        'aztec-rabbit' )
+            stop false && start && is_running || { clear; clear; banner; echo; update; stop false; bash $0; exit; }
         ;;
 
         * )

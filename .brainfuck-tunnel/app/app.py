@@ -26,6 +26,14 @@ def colors(value):
 
     return value
 
+def log(value, color='[G1]'):
+    with lock:
+        print(colors('{color}[{time}] {value}'.format(
+            time=datetime.datetime.now().strftime('%H:%M:%S'),
+            value=value,
+            color=color
+        )))
+
 def log_file(file_name, value, color='[G1]'):
     with lock:
         with open(file_name, 'a') as file:
