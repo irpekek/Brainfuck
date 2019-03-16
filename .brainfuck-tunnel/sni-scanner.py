@@ -4,7 +4,7 @@ import socket
 from app import app
 
 def main():
-    host = str('185.199.108.153')
+    host = str('3.85.154.144')
     port = int('443')
     server_name_indication = sys.argv[1]
 
