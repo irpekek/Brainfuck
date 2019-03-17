@@ -17,8 +17,8 @@ Usage
 
 Add this line to the end of file `.bashrc`
 
-	PATH="${PATH}:."
-	PATH="${PATH}:${HOME}/.brainfuck"
+    PATH="${PATH}:."
+    PATH="${PATH}:${HOME}/.brainfuck"
 
 And then execute brainfuck like this:
 
