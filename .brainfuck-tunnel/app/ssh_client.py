@@ -26,7 +26,7 @@ class ssh_client(object):
             
             response = subprocess.Popen(
                 (
-                    'sshpass -p "{password}" ssh -v -CND {sockport} {host} -p {port} -l "{username}" ' + \
+                    'sshpass -p "{password}" ssh -v -CND 0.0.0.0:{sockport} {host} -p {port} -l "{username}" ' + \
                     '-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ProxyCommand="{}"'.format(proxy_command)
                 ).format(
                     host=host,
