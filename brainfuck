@@ -5,7 +5,7 @@ R1='[31;1m'
 G1='[32;1m'
 Y1='[33;1m'
 
-DIR="$( dirname $(readlink -f $0))"
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd )"
 PYTHON='python3'
 BRAINFUCK_TUNNEL="${DIR}/.brainfuck-tunnel"
 
@@ -34,31 +34,31 @@ logtime()
 
 createfile()
 {
-    touch $1 &> /dev/null
+    touch "$*" &> /dev/null
 }
 
 deletefile()
 {
-    rm -f $1 &> /dev/null
+    rm -f "$*" &> /dev/null
 }
 
 readfile()
 {
-    createfile $1
-    cat $1
+    createfile "$*"
+    cat "$*"
 }
 
 readjson()
 {
-    cat $1 | grep "\"$2\": " | awk -F '"' '{print $4}'
+    cat "$1" | grep "\"$2\": " | awk -F '"' '{print $4}'
 }
 
 killpid()
 {
-    createfile $1
-    while read pid; do kill $pid &> /dev/null; done < $1
-    deletefile $1
-    createfile $1
+    createfile "$1"
+    while read pid; do kill $pid &> /dev/null; done < "$1"
+    deletefile "$1"
+    createfile "$1"
 }
 
 service()
@@ -68,7 +68,7 @@ service()
 
 stopscreen()
 {
-    echo $2 >> $1
+    echo "$2" >> "$1"
 }
 
 #
@@ -107,8 +107,8 @@ start()
         0 )
             deletefile $BRAINFUCK_TUNNEL_APP_LOG
             createfile $BRAINFUCK_TUNNEL_APP_LOG
-            service $PYTHON $BRAINFUCK_TUNNEL_APP
-            tail -f $BRAINFUCK_TUNNEL_APP_LOG -n 0 | {
+            $PYTHON "$BRAINFUCK_TUNNEL_APP" &> /dev/null & disown
+            tail -f "$BRAINFUCK_TUNNEL_APP_LOG" -n 0 | {
                 while read line; do
                     if [[ -z "$line" ]]; then
                         echo; continue
@@ -118,7 +118,7 @@ start()
                         'Disconnected' )
                             stop false
 
-                            stopscreen $BRAINFUCK_TUNNEL_APP_LOG
+                            stopscreen "$BRAINFUCK_TUNNEL_APP_LOG"
                             break
                         ;;
 
@@ -127,7 +127,7 @@ start()
 
                             # configurations iptables and redsocks here
 
-                            stopscreen $BRAINFUCK_TUNNEL_APP_LOG "${G1}[$( date +%T )] Brainfuck running in the background"
+                            stopscreen "$BRAINFUCK_TUNNEL_APP_LOG" "${G1}[$( date +%T )] Brainfuck running in the background"
                             break
                         ;;
 
@@ -181,7 +181,7 @@ showlog()
         1 )
             while read line; do
                 log "$line"
-            done < $BRAINFUCK_TUNNEL_APP_LOG
+            done < "$BRAINFUCK_TUNNEL_APP_LOG"
         ;;
     esac
 }
@@ -196,9 +196,9 @@ update()
 
 reset_to_default_settings()
 {
-    logtime 'Reseting to default settings'
-    $PYTHON $BRAINFUCK_TUNNEL_RESET_TO_DEFAULT_SETTINGS &> /dev/null
-    logtime 'Reseting to default settings complete'
+    logtime "Reseting to default settings"
+    $PYTHON "$BRAINFUCK_TUNNEL_RESET_TO_DEFAULT_SETTINGS" &> /dev/null
+    logtime "Reseting to default settings complete"
 }
 
 help()
@@ -254,7 +254,7 @@ menu()
                 return
             fi
 
-            $PYTHON $BRAINFUCK_TUNNEL_SNI_SCANNER $2
+            $PYTHON "$BRAINFUCK_TUNNEL_SNI_SCANNER" $2
         ;;
 
         'aztec-rabbit' )
@@ -276,12 +276,12 @@ if [[ ! -z $(readfile $BRAINFUCK_TUNNEL_COMMAND_PYTHON ) ]]; then
     PYTHON=$(readfile $BRAINFUCK_TUNNEL_COMMAND_PYTHON | awk 'NR==1' | awk -F '\r' '{print $1}' )
 fi
 
-$PYTHON $BRAINFUCK_TUNNEL_DEFAULT_SETTINGS &> /dev/null
+$PYTHON "$BRAINFUCK_TUNNEL_DEFAULT_SETTINGS"
 
-HOST=$( readjson $BRAINFUCK_TUNNEL_ACCOUNT host )
-PORT=$( readjson $BRAINFUCK_TUNNEL_ACCOUNT port )
-USERNAME=$( readjson $BRAINFUCK_TUNNEL_ACCOUNT username )
-PASSWORD=$( readjson $BRAINFUCK_TUNNEL_ACCOUNT password )
-SOCKPORT=$( readjson $BRAINFUCK_TUNNEL_ACCOUNT sockport )
+HOST=$( readjson "$BRAINFUCK_TUNNEL_ACCOUNT" host )
+PORT=$( readjson "$BRAINFUCK_TUNNEL_ACCOUNT" port )
+USERNAME=$( readjson "$BRAINFUCK_TUNNEL_ACCOUNT" username )
+PASSWORD=$( readjson "$BRAINFUCK_TUNNEL_ACCOUNT" password )
+SOCKPORT=$( readjson "$BRAINFUCK_TUNNEL_ACCOUNT" sockport )
 
 menu $*
