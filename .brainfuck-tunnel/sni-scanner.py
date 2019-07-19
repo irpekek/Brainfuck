@@ -4,7 +4,7 @@ import socket
 from app import app
 
 def main():
-    host = str('3.85.154.144')
+    host = str('httpbin.org')
     port = int('443')
     server_name_indication = sys.argv[1]
 
