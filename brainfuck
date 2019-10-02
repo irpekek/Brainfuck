@@ -161,6 +161,7 @@ stop()
             # configurations iptables and redsocks here
 
             killpid "$BRAINFUCK_TUNNEL_APP_PID"
+            killall sshpass > /dev/null 2>&1
 
             if [[ -z $1 ]]; then
                 logtime "Brainfuck stopped." $R1
@@ -278,10 +279,20 @@ fi
 
 $PYTHON "$BRAINFUCK_TUNNEL_DEFAULT_SETTINGS"
 
-HOST=$( readjson "$BRAINFUCK_TUNNEL_ACCOUNT" host )
-PORT=$( readjson "$BRAINFUCK_TUNNEL_ACCOUNT" port )
-USERNAME=$( readjson "$BRAINFUCK_TUNNEL_ACCOUNT" username )
-PASSWORD=$( readjson "$BRAINFUCK_TUNNEL_ACCOUNT" password )
-SOCKPORT=$( readjson "$BRAINFUCK_TUNNEL_ACCOUNT" sockport )
+# HOST=$( readjson "$BRAINFUCK_TUNNEL_ACCOUNT" host )
+# PORT=$( readjson "$BRAINFUCK_TUNNEL_ACCOUNT" port )
+# USERNAME=$( readjson "$BRAINFUCK_TUNNEL_ACCOUNT" username )
+# PASSWORD=$( readjson "$BRAINFUCK_TUNNEL_ACCOUNT" password )
+# SOCKPORT=$( readjson "$BRAINFUCK_TUNNEL_ACCOUNT" sockport )
 
-menu $*
+if [[ $(id -u) -eq 0 ]]; then
+    menu $*
+
+else
+    clear; banner
+
+    echo
+    logtime "PLease run \"sudo -s\" first!" ${R1}
+    echo
+
+fi

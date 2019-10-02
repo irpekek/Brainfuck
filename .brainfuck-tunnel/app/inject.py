@@ -8,6 +8,7 @@ class inject(threading.Thread):
         super(inject, self).__init__()
 
         self.socket_inject = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.socket_inject.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.host, self.port = self.host_port = host_port
         self.tunnel_type = tunnel_type
         self.daemon = True
