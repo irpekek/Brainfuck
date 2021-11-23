@@ -12,7 +12,7 @@ See: [Brainfuck Tunnel]
 Usage
 -----
 
-    $ git clone https://github.com/AztecRabbit/Brainfuck .brainfuck
+    $ git clone https://github.com/irpekek/Brainfuck .brainfuck
     $ chmod +x .brainfuck/brainfuck
 
 Add this line to the end of file `.bashrc`
