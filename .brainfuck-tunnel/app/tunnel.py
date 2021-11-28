@@ -243,6 +243,32 @@ class tunnel(threading.Thread):
             self.socket_tunnel.close()
             self.socket_client.close()
 
+    # HTTP Proxy -> SSH (SSL/TLS) + Payload
+    def tunnel_type_4(self):
+        try:
+            self.server_name_indication = self.get_server_name_indication()
+            self.proxy_host, self.proxy_port = self.get_proxy()
+            self.payload = self.get_payload()
+
+            self.log('Connecting to remote proxy {} port {}'.format(
+                self.proxy_host, self.proxy_port))
+            self.socket_tunnel.connect((self.proxy_host, self.proxy_port))
+            self.log('Server name indication: {}'.format(
+                self.server_name_indication))
+            self.socket_tunnel = ssl.SSLContext(ssl.PROTOCOL_TLS).wrap_socket(
+                self.socket_tunnel, server_hostname=self.server_name_indication, do_handshake_on_connect=self.do_handshake_on_connect)
+
+            self.certificate()
+            self.send_payload(self.payload)
+            self.handler()
+        except socket.timeout:
+            pass
+        except socket.error:
+            pass
+        finally:
+            self.socket_tunnel.close()
+            self.socket_client.close()
+
     def run(self):
         self.socket_tunnel = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket_tunnel.settimeout(self.timeout)
@@ -258,3 +284,5 @@ class tunnel(threading.Thread):
             self.tunnel_type_2()
         elif self.tunnel_type == '3':
             self.tunnel_type_3()
+        elif self.tunnel_type == '4':
+            self.tunnel_type_4()
